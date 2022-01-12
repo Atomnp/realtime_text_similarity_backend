@@ -1,4 +1,5 @@
 import tensorflow_hub as hub
+import tensorflow
 import numpy as np
 
 module_url = "https://tfhub.dev/google/universal-sentence-encoder/4"
