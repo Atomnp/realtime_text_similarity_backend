@@ -5,7 +5,11 @@ Backend for realtime text semantic similarity identification
 ## How to run?
 
 1. set git hooks path
-    `git config core.hooksPath .githooks`
+
+    `git config core.hooksPath .githooks` --did not work
+
+    `git config --unset-all core.hooksPath`
+    `pre-commit install`
 
 2. start flask server
 
