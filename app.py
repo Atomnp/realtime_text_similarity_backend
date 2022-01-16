@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from algorithms import get_similar
 from flask_cors import CORS, cross_origin
@@ -13,7 +13,7 @@ api = Api(app)
 
 class Similarity(Resource):
     def get(self):
-        return {"hello": "world"}
+        return jsonify({"hello": "world"})
 
     def post(self):
         json_data = request.get_json(force=True)
@@ -25,4 +25,4 @@ class Similarity(Resource):
 
 api.add_resource(Similarity, "/")
 if __name__ == "__main__":
-    app.run(debug=True, use_reloader=False)
+    app.run(debug=True)
