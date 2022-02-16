@@ -1,3 +1,4 @@
+from importlib.resources import path
 from encoders import *
 from enum import Enum
 from search_index import AnnoyIndex
@@ -12,8 +13,9 @@ class Algorithm(Enum):
 
 class Runtime:
     def __init__(self):
-        self.encoder = UniversalEncoder()
-        annoy_index = AnnoyIndex()
+        self.encoder = UniversalEncoder(model_path="./USE")
+        #  we need to know the dimension of vectors embedding to load existing index
+        annoy_index = AnnoyIndex(dimension=512)
         self.index = annoy_index.load("GIVE_ME_INDEX_PATH")
         self.encoder_type = Algorithm.USE
 

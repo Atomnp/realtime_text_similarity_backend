@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
-from algorithms import get_similar
 from flask_cors import CORS, cross_origin
 
 from algorithms import Runtime
