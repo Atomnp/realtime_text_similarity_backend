@@ -1,5 +1,6 @@
 absl-py==1.0.0
 aniso8601==9.0.1
+annoy==1.17.0
 astunparse==1.6.3
 black==21.12b0
 cachetools==4.2.4
