@@ -2,6 +2,7 @@
 from gensim.models import Word2Vec
 from encoders.base import Encoder
 import numpy as np
+from nltk.tokenize import word_tokenize
 
 # from sklearn.decomposition import PCA
 import pickle
@@ -11,7 +12,7 @@ from gensim.models.callbacks import CallbackAny2Vec
 
 class Arora(Encoder):
     def __init__(self):
-        self.w2v_model = Word2Vec.load("./indices/word2vec_6_iter.model")
+        self.w2v_model = Word2Vec.load("./indices/word2vec.model")
         self.pca0 = np.load("./indices/pca0_arora.npy", allow_pickle=True)
         with open("./indices/wf_arora.pickle", "rb") as fp:
             self.wf = pickle.load(fp)
@@ -21,6 +22,7 @@ class Arora(Encoder):
         return self.wf[word_text] / self.unique_words
 
     def encode(self, sentence: str, embedding_size=100, a=1e-3):
+        sentence = word_tokenize(sentence.lower())
         vs = np.zeros(embedding_size)
         for word in sentence:
             a_value = a / (a + self.get_word_frequency(word))

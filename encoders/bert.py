@@ -8,5 +8,5 @@ class BERT(Encoder):
 
     # @property
     def encode(self, sentence):
-        embeddings = self.model([sentence])
+        embeddings = self.model.encode(sentence)
         return embeddings

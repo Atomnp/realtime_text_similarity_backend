@@ -2,6 +2,7 @@ from importlib.resources import path
 from encoders.arora import Arora
 from encoders.use import UniversalEncoder
 from encoders.bert import BERT
+from encoders.word2vec import word2vec
 from enum import Enum
 from search_index import AnnoyIndex
 
@@ -29,14 +30,23 @@ class Runtime:
     def switch_algo(self, algo: Algorithm):
         if self.encoder_type == algo:
             return
-        if algo == Algorithm.WORD_2_VEC:
-            # self.encoder = word2vecencoder
-            # self.encoder
-            pass
+        elif algo == Algorithm.USE:
+            self.encoder = UniversalEncoder(model_path="./USE")
+            #  we need to know the dimension of vectors embedding to load existing index
+            annoy_index = AnnoyIndex(dimension=512)
+            annoy_index.load("./indices/sent_enc_index.ann")
+            self.index = annoy_index
+            self.encoder_type = Algorithm.USE
+        elif algo == Algorithm.WORD_2_VEC:
+            self.encoder = word2vec()
+            annoy_index = AnnoyIndex(dimension=100)
+            annoy_index.load("./indices/word2vec.ann")
+            self.index = annoy_index
+            self.encoder_type = Algorithm.WORD_2_VEC
         elif algo == Algorithm.ARORA:
             self.encoder = Arora()
             annoy_index = AnnoyIndex(dimension=100)
-            annoy_index.load("./indices/weighted_annoy_index.ann")
+            annoy_index.load("./indices/arora.ann")
             self.index = annoy_index
             self.encoder_type = Algorithm.ARORA
         elif algo == Algorithm.BERT:

@@ -66,6 +66,10 @@ class RequestHandler(Resource):
     #     qn = json_data["question"]
 
 
+def identity_tokenizer(text):
+    return text
+
+
 api.add_resource(RequestHandler, "/")
 if __name__ == "__main__":
     app.run(debug=True)
