@@ -1,5 +1,6 @@
 from importlib.resources import path
-from encoders import *
+from encoders.arora import *
+from encoders.use import *
 from enum import Enum
 from search_index import AnnoyIndex
 
@@ -22,11 +23,18 @@ class Runtime:
 
     def get_similar(self, question):
         emb = self.encoder.encode(question)
-        return self.index.query(emb[0])
+        return self.index.query(emb)
 
     def switch_algo(self, algo: Algorithm):
-        if self.encoder_type != algo:
+        if self.encoder_type == algo:
             return
         if algo == Algorithm.WORD_2_VEC:
-            # self.encoder=
+            # self.encoder = word2vecencoder
+            # self.encoder
             pass
+        elif algo == Algorithm.ARORA:
+            self.encoder = Arora()
+            annoy_index = AnnoyIndex(dimension=100)
+            annoy_index.load("./indices/weighted_annoy_index.ann")
+            self.index = annoy_index
+            self.encoder_type = Algorithm.ARORA
