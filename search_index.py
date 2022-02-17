@@ -12,7 +12,8 @@ class AnnoyIndex:
         return [self.labels[i] for i in indices]
 
     def load(self, path):
-        label_path = path.split(".")[0] + ".labels"
+        assert path[-4:] == ".ann", print("Path must be given to some .ann file")
+        label_path = path[:-4] + ".labels"
         self.index = annoy.AnnoyIndex(self.dimension)
         with open(label_path, "rb") as fp:
             self.labels = pickle.load(fp)

@@ -16,7 +16,8 @@ class Runtime:
         self.encoder = UniversalEncoder(model_path="./USE")
         #  we need to know the dimension of vectors embedding to load existing index
         annoy_index = AnnoyIndex(dimension=512)
-        self.index = annoy_index.load("GIVE_ME_INDEX_PATH")
+        annoy_index.load("./indices/sent_enc_index.ann")
+        self.index = annoy_index
         self.encoder_type = Algorithm.USE
 
     def get_similar(self, question):

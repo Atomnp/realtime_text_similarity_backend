@@ -21,9 +21,6 @@ class RequestHandler(Resource):
         json_data = request.get_json(force=True)
         qn = json_data["question"]
         return runtime.get_similar(qn)
-        # similarity = get_similar(qn)
-        # x = {key: str(val) for key, val in similarity.items()}
-        # return x
 
 
 api.add_resource(RequestHandler, "/")
