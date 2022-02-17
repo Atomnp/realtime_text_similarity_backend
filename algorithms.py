@@ -1,6 +1,7 @@
 from importlib.resources import path
-from encoders.arora import *
-from encoders.use import *
+from encoders.arora import Arora
+from encoders.use import UniversalEncoder
+from encoders.bert import BERT
 from enum import Enum
 from search_index import AnnoyIndex
 
@@ -38,3 +39,9 @@ class Runtime:
             annoy_index.load("./indices/weighted_annoy_index.ann")
             self.index = annoy_index
             self.encoder_type = Algorithm.ARORA
+        elif algo == Algorithm.BERT:
+            self.encoder = BERT()
+            annoy_index = AnnoyIndex(dimension=768)
+            annoy_index.load("./indices/bert.ann")
+            self.index = annoy_index
+            self.encoder_type = Algorithm.BERT

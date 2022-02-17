@@ -6,7 +6,9 @@ from algorithms import Algorithm, Runtime
 
 from gensim.models.callbacks import CallbackAny2Vec
 
+import os
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 # cors = CORS(app)
