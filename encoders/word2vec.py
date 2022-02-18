@@ -32,4 +32,8 @@ class word2vec(Encoder):
         arrlist = np.array(list(map(lambda x: self.w2v_model.wv[x[0]], filtered[:5])))
 
         sentence_embedding = np.mean(arrlist, axis=0)
-        return sentence_embedding
+        
+        if type(sentence_embedding) == np.ndarray:
+            return sentence_embedding
+        else:
+            return np.random.randn(embedding_size)
