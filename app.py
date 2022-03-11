@@ -69,6 +69,17 @@ class RequestHandler(Resource):
 def identity_tokenizer(text):
     return text
 
+# need to validate for file types or empty files (edge case)
+class FileUploadHandler(Resource):
+    def post(self):
+        print("filecome.........$$$$$$$$$$$$", request.files)
+        file = request.files['file']
+        file.save("uploads/"+file.filename)
+        print(request.files['file'])
+        runtime.change_index("uploads/"+file.filename)
+        return ["ok"]
+
+api.add_resource(FileUploadHandler, "/files")
 
 api.add_resource(RequestHandler, "/")
 if __name__ == "__main__":

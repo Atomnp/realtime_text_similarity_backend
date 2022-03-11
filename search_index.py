@@ -1,5 +1,6 @@
 import annoy
 import pickle
+import numpy as np
 
 
 class AnnoyIndex:
@@ -18,3 +19,19 @@ class AnnoyIndex:
         with open(label_path, "rb") as fp:
             self.labels = pickle.load(fp)
         self.index.load(path)
+
+    def build(self,vectors, labels, number_of_trees=5):
+        # self.vectors = vectors
+        self.labels = labels 
+
+        for i, vec in enumerate(vectors):
+          if not np.isnan(np.sum(vec)):
+            self.index.add_item(i, vec)
+        self.index.build(number_of_trees)
+    
+    def save(self,path):
+        label_path=path.split(".ann")[0]+".labels"
+        print(label_path)
+        with open(label_path,'wb') as fp:
+            pickle.dump(self.labels,fp)
+        self.index.save(path)

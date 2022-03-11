@@ -10,3 +10,7 @@ class BERT(Encoder):
     def encode(self, sentence):
         embeddings = self.model.encode(sentence)
         return embeddings
+
+    def encode_array(self, sentences):
+        embeddings = self.model.encode(sentences)
+        return embeddings

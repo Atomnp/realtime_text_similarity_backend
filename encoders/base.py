@@ -7,6 +7,11 @@ class Encoder(metaclass=abc.ABCMeta):  # python 3
     def encode(self, sentence: str):
         """required method"""
         return
+    
+    # @abc.abstractmethod
+    # def encodeArray(self, sentence: [str]):
+    #     """required method"""
+    #     return
 
     # @abc.abstractproperty
     # def some_property(self):

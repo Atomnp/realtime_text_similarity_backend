@@ -15,3 +15,7 @@ class UniversalEncoder(Encoder):
     def encode(self, sentence):
         embeddings = self.model([sentence])
         return embeddings[0]
+
+    def encode_array(self, sentences):
+        embeddings = self.model(sentences)
+        return embeddings

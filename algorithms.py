@@ -16,6 +16,7 @@ class Algorithm(Enum):
 
 class Runtime:
     def __init__(self):
+        self.algo=Algorithm.USE
         self.encoder = UniversalEncoder(model_path="./USE")
         #  we need to know the dimension of vectors embedding to load existing index
         annoy_index = AnnoyIndex(dimension=512)
@@ -27,7 +28,20 @@ class Runtime:
         emb = self.encoder.encode(question)
         return self.index.query(emb)
 
-    def switch_algo(self, algo: Algorithm):
+    # generates new index from uploaded data 
+    def change_index(self,filename):
+        questions=[]
+        with open(filename,"r") as fp:
+            questions=[x.strip().lower() for x in fp.readlines()]
+
+        embeddings=self.encoder.encode_array(questions)
+        annoy_index = AnnoyIndex(dimension=512)
+        annoy_index.build(embeddings, questions)
+        annoy_index.save("./indices/"+filename+str(self.current_algo)+".ann")
+        self.index=annoy_index
+
+    def switch_algo(self, algo: Algorithm, filename="default"):
+        self.current_algo=algo
         if self.encoder_type == algo:
             return
         elif algo == Algorithm.USE:
