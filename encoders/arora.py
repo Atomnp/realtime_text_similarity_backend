@@ -1,44 +1,55 @@
-# from gensim.models.word2vec import Word2Vec
-from gensim.models import Word2Vec
 from encoders.base import Encoder
-import numpy as np
-from nltk.tokenize import word_tokenize
-
-# from sklearn.decomposition import PCA
 import pickle
 
-from gensim.models.callbacks import CallbackAny2Vec
-
+from fse import Vectors, IndexedList
+from fse.models import uSIF,Average
+# import gensim.downloader as api
+# data = api.load("quora-duplicate-questions")
+# wv = Vectors.from_pretrained("word2vec-google-news-300")
 
 class Arora(Encoder):
     def __init__(self):
-        self.w2v_model = Word2Vec.load("./indices/word2vec.model")
-        self.pca0 = np.load("./indices/pca0_arora.npy", allow_pickle=True)
-        with open("./indices/wf_arora.pickle", "rb") as fp:
-            self.wf = pickle.load(fp)
-            self.unique_words = sum(self.wf.values())
+        self.wv=Vectors.from_pretrained("paranmt-300")
+        self.model = Average(self.wv, workers=1, lang_freq="en")
 
-    def get_word_frequency(self, word_text):
-        return self.wf[word_text] / self.unique_words
+    def encode(self, sentence: str, embedding_size=300, a=1e-3):
+        sentence=sentence.replace("?","")
+        iList = IndexedList([sentence.split()])
+        self.model.train(iList)
+        return self.model.sv[0]
+        # return self.model.infer([tmp])
+    
+    def encode_array(self, sentences):
+        iList = IndexedList([s.split() for s in sentences])
+        self.model.train(iList)
+        return self.model.sv.vectors
 
-    def encode(self, sentence: str, embedding_size=100, a=1e-3):
-        sentence = word_tokenize(sentence.lower())
-        vs = np.zeros(embedding_size)
-        for word in sentence:
-            a_value = a / (a + self.get_word_frequency(word))
-            if word in self.w2v_model.wv:
-                vs = np.add(vs, np.multiply(a_value, self.w2v_model.wv[word]))
-        vs = np.divide(vs, 1 if not len(sentence) else len(sentence))
+if __name__=='__main__':
+    sentences_a = ["Hello there", "how are you?"]
+    sentences_b = ["today is a good day", "Lorem ipsum"]
 
-        # calculate PCA of this sentence
-        # pca.transform([vs])
-        u = self.pca0  # the PCA vector
-        u = np.multiply(u, np.transpose(u))  # u x uT
 
-        # pad the vector?  (occurs if we have less sentences than embeddings_size)
-        if len(u) < embedding_size:
-            for i in range(embedding_size - len(u)):
-                u = np.append(u, 0)  # add needed extension for multiplication below
+    from fse.models import uSIF
+    model = uSIF(glove, workers=1, lang_freq="en")
 
-        # resulting sentence vectors, vs = vs -u x uT x vs
-        return np.subtract(vs, np.multiply(u, vs))
+    sentences = []
+    j = 0
+    for d in data:
+        if j == 100:
+            break
+        j += 1
+        for i in range(8):
+            sentences.append(d["question1"].split())
+            sentences.append(d["question2"].split())
+    s = IndexedList(sentences)
+    # print(sentences[:5])
+    # print(len(s))
+
+    model.train(s)
+    # print(len(model.sv[0]), "lenght")
+
+    print(model.sv)
+
+    # print(s[100])
+    # tmp = ("Hello my friends".split(), 0)
+    # model.infer([tmp])
