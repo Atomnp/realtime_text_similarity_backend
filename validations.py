@@ -7,6 +7,22 @@ from encoders.word2vec import word2vec
 
 filename = "/home/smloy/Downloads/dataset (2).txt"
 
+def get_accuracy(encoder,sentences):
+    embeddings = encoder.encode_array([question[0]+"?" for question in questions])
+    annoy_index = AnnoyIndex(dimension=len(embeddings[0]))
+    annoy_index.build(embeddings, [question[1] for question in questions])
+    accuracy = 0
+        
+    for question, unique_id in questions:
+        no_of_similar_sent = [question[1] for question in questions].count(unique_id)
+        neighbours = annoy_index.query(encoder.encode(question), k=no_of_similar_sent)
+        # print(neighbours)
+        true_similar_count = neighbours.count(unique_id)
+        accuracy += true_similar_count / no_of_similar_sent
+    
+    return accuracy/len(embeddings)*100
+
+
 if __name__ == "__main__":
     questions = []
     with open(filename, "r") as fp:
@@ -16,25 +32,27 @@ if __name__ == "__main__":
         len(questions[0]) == 2
     ), "first item should be sentence second item shoud be number representing unique question id"
     # encoder = UniversalEncoder(model_path="./USE")
-    encoder = Arora()
-    embeddings = encoder.encode_array([question[0]+"?" for question in questions])
-    annoy_index = AnnoyIndex(dimension=len(embeddings[0]))
-    print("questions ", questions)
+    question_array=[question[0]+"?" for question in questions]
 
-    for question in questions:
-        print(question)
-        if not question[1]:
-            print(question)
+    bert_accuracy=get_accuracy(BERT(),question_array)
+    arora_accuracy=get_accuracy(Arora(),question_array)
+    use_accuracy=get_accuracy(UniversalEncoder(),question_array)
+    # word2vec_accuracy=get_accuracy(word2vec(),question_array)
 
-    annoy_index.build(embeddings, [question[1] for question in questions])
-    accuracy = 0
+    print("bert_accuracy: {0}\n arora_accuracy: {1}\n use_accuracy: {2}".format(bert_accuracy,arora_accuracy,use_accuracy))
+
+    # encoder = BERT()
+    # embeddings = encoder.encode_array(question_array)
+    # annoy_index = AnnoyIndex(dimension=len(embeddings[0]))
+    # annoy_index.build(embeddings, [question[1] for question in questions])
+    # accuracy = 0
         
-    for question, unique_id in questions:
-        no_of_similar_sent = [question[1] for question in questions].count(unique_id)
-        neighbours = annoy_index.query(encoder.encode(question), k=no_of_similar_sent)
-        print(neighbours)
-        true_similar_count = neighbours.count(unique_id)
-        accuracy += true_similar_count / no_of_similar_sent
+    # for question, unique_id in questions:
+    #     no_of_similar_sent = [question[1] for question in questions].count(unique_id)
+    #     neighbours = annoy_index.query(encoder.encode(question), k=no_of_similar_sent)
+    #     print(neighbours)
+    #     true_similar_count = neighbours.count(unique_id)
+    #     accuracy += true_similar_count / no_of_similar_sent
 
     # for question, unique_id in questions:
     #     no_of_similar_sent = [question[1] for question in questions].count(unique_id)
@@ -49,7 +67,7 @@ if __name__ == "__main__":
 
     #     accuracy += numerator / denominator
 
-    print(f"accuracy={accuracy/len(embeddings)*100}")
+    # print(f"accuracy={accuracy/len(embeddings)*100}")
 
     # annoy_index.save("./indices/" + filename + str(self.current_algo) + ".ann")
     # self.index = annoy_index
