@@ -186,6 +186,7 @@ tomli==1.2.3
 tqdm==4.62.3
 typing_extensions==4.1.0
 ua-parser==0.10.0
+ufw==0.36.1
 urllib3==1.26.8
 user-agents==2.2.0
 virtualenv==20.13.0
