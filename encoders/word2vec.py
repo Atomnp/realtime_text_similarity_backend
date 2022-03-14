@@ -54,7 +54,7 @@ class word2vec(Encoder):
             )
             if filtered == []:
                 embeddings.append(np.random.randn(embedding_size))
-                break
+                continue
             arrlist = np.array(
                 list(map(lambda x: self.w2v_model.wv[x[0]], filtered[:5]))
             )
