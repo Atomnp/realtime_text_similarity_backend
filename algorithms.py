@@ -61,7 +61,7 @@ class Runtime:
             self.encoder_type = Algorithm.WORD_2_VEC
         elif algo == Algorithm.ARORA:
             self.encoder = Arora()
-            annoy_index = AnnoyIndex(dimension=100)
+            annoy_index = AnnoyIndex(dimension=300)
             annoy_index.load("./indices/arora.ann")
             self.index = annoy_index
             self.encoder_type = Algorithm.ARORA

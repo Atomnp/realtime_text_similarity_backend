@@ -5,7 +5,7 @@ from encoders.use import UniversalEncoder
 from encoders.bert import BERT
 from encoders.word2vec import word2vec
 
-filename = "./uploads/dataset (2).txt"
+filename = "./datasets/validate.txt"
 
 
 def get_accuracy(encoder, sentences):
@@ -24,6 +24,7 @@ def get_accuracy(encoder, sentences):
 
     return accuracy / len(embeddings) * 100
 
+
 def get_accuracy_mrr(encoder, sentences):
 
     embeddings = encoder.encode_array([question[0] + "?" for question in questions])
@@ -35,16 +36,17 @@ def get_accuracy_mrr(encoder, sentences):
         no_of_similar_sent = [question[1] for question in questions].count(unique_id)
         neighbours = annoy_index.query(encoder.encode(question), k=no_of_similar_sent)
         # print(neighbours)
-        denominator=0
-        numerator=0
+        denominator = 0
+        numerator = 0
         for i in range(no_of_similar_sent):
-            denominator+=1/(i+1)
-            if neighbours[i]==unique_id:
-                numerator += 1/(i+1)
+            denominator += 1 / (i + 1)
+            if neighbours[i] == unique_id:
+                numerator += 1 / (i + 1)
 
         accuracy += numerator / denominator
 
-    return accuracy/len(embeddings)*100
+    return accuracy / len(embeddings) * 100
+
 
 from gensim.models.callbacks import CallbackAny2Vec
 
@@ -73,6 +75,30 @@ class callback(CallbackAny2Vec):
         self.loss_previous_step = loss
 
 
+import math
+
+
+def get_accuracy_ndcg(encoder, sentences):
+
+    embeddings = encoder.encode_array([question[0] + "?" for question in questions])
+    annoy_index = AnnoyIndex(dimension=len(embeddings[0]))
+    annoy_index.build(embeddings, [question[1] for question in questions])
+
+    ndcgs = []
+    for question, unique_id in questions:
+        no_of_similar_sent = [question[1] for question in questions].count(unique_id)
+        neighbours = annoy_index.query(encoder.encode(question), k=no_of_similar_sent)
+        # print(neighbours, unique_id)
+        # break
+        dcg = 0
+        for i, n in enumerate(neighbours):
+            match = 1 if n == unique_id else 0
+            dcg += match / math.log(i + 2, 2)
+        best_dcg = sum(1 / math.log(i + 2, 2) for i in range(no_of_similar_sent))
+        ndcgs.append(dcg / best_dcg)
+    return sum(ndcgs) / len(ndcgs)
+
+
 if __name__ == "__main__":
     questions = []
     with open(filename, "r") as fp:
@@ -86,7 +112,7 @@ if __name__ == "__main__":
 
     bert_accuracy = get_accuracy(BERT(), question_array)
     arora_accuracy = get_accuracy(Arora(), question_array)
-    use_accuracy = get_accuracy(UniversalEncoder(), question_array)
+    use_accuracy = get_accuracy(UniversalEncoder("./USE"), question_array)
     word2vec_accuracy = get_accuracy(word2vec(), question_array)
     print(
         "bert_accuracy: {0}\n arora_accuracy: {1}\n use_accuracy: {2}\n word2vec_accuracy: {3}".format(
@@ -96,10 +122,20 @@ if __name__ == "__main__":
 
     bert_accuracy = get_accuracy_mrr(BERT(), question_array)
     arora_accuracy = get_accuracy_mrr(Arora(), question_array)
-    use_accuracy = get_accuracy_mrr(UniversalEncoder(), question_array)
+    use_accuracy = get_accuracy_mrr(UniversalEncoder("./USE"), question_array)
     word2vec_accuracy = get_accuracy_mrr(word2vec(), question_array)
     print(
         "bert_accuracy: {0}\n arora_accuracy: {1}\n use_accuracy: {2}\n word2vec_accuracy: {3}".format(
             bert_accuracy, arora_accuracy, use_accuracy, word2vec_accuracy
+        )
+    )
+
+    bert_ndcg = get_accuracy_ndcg(BERT(), question_array)
+    arora_ndcg = get_accuracy_ndcg(Arora(), question_array)
+    use_ndcg = get_accuracy_ndcg(UniversalEncoder("./USE"), question_array)
+    word2vec_ndcg = get_accuracy_ndcg(word2vec(), question_array)
+    print(
+        "bert_ndcg: {0}\n arora_ndcg: {1}\n use_ndcg: {2}\n word2vec_ndcg: {3}".format(
+            bert_ndcg, arora_ndcg, use_ndcg, word2vec_ndcg
         )
     )
