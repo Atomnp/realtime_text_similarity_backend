@@ -72,7 +72,6 @@ def identity_tokenizer(text):
 # need to validate for file types or empty files (edge case)
 class FileUploadHandler(Resource):
     def post(self):
-        print("filecome.........$$$$$$$$$$$$", request.files)
         file = request.files['file']
         file.save("uploads/"+file.filename)
         print(request.files['file'])

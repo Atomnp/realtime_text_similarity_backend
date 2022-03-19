@@ -35,10 +35,10 @@ class Runtime:
             questions = [
                 x.strip().lower().split("?,") for x in fp.readlines() if x != "\n"
             ]
-
-        embeddings = self.encoder.encode_array([question[0] for question in questions])
+        questions_string = [question[0] for question in questions]
+        embeddings = self.encoder.encode_array(questions_string)
         annoy_index = AnnoyIndex(dimension=len(embeddings[0]))
-        annoy_index.build(embeddings, questions)
+        annoy_index.build(embeddings, questions_string)
         annoy_index.save("./indices/" + filename + str(self.current_algo) + ".ann")
         self.index = annoy_index
 
